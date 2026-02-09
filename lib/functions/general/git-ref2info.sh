@@ -169,6 +169,22 @@ function memoized_git_ref_to_info() {
 					url="${gitlab_path}/-/raw/${sha1}/Makefile"
 					;;
 
+                                "https://git.odroid.com/"*)
+					# parse org/repo from https://github.com/org/repo
+					declare org_and_repo=""
+					org_and_repo="$(echo "${git_source}" | cut -d/ -f4-5)"
+					org_and_repo="${org_and_repo%.git}" # remove .git if present
+
+                                        # Gerrit REST API
+                                        org_and_repo=${org_and_repo//\//%2F} # Escape forward slashes
+                                        url="https://git.odroid.com/projects/${org_and_repo}/branches/${ref_name}/files/Makefile/content"
+
+                                        # Content is returned Base64, so handle it here ...
+                                        declare makefile_body=$(wget --output-document - "${url}" | base64 -d)
+                                        parse_makefile_version "${makefile_body}"
+                                        return 0
+                                        ;;
+
 				*)
 					exit_with_error "Unknown git source '${git_source}'"
 					;;
