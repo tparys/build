@@ -1,0 +1,17 @@
+diff --git a/board/amlogic/env/android_ott.env b/board/amlogic/env/android_ott.env
+index 1ce165c954..a4b1c9016a 100644
+--- a/board/amlogic/env/android_ott.env
++++ b/board/amlogic/env/android_ott.env
+@@ -282,8 +282,10 @@ boot_attempt=
+ 	echo "## Attempting fetch ${script} in ${devtype}:${devnum}...";
+ 	for part in ${boot_partitions}; do
+ 		setenv bootpart ${part};
+-		load ${devtype} ${devnum}:${bootpart} 0x1080000 boot.scr;
+-		source 0x1080000;
++		for prefix in / /boot/; do
++			load ${devtype} ${devnum}:${bootpart} 0x1080000 ${prefix}boot.scr;
++			source 0x1080000;
++                done
+ 	done;
+ 
+ boot_default=
